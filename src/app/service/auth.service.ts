@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http'
 import { User } from 'src/models/user.model';
-import { Observable } from 'rxjs';
+import { catchError, map, Observable, of } from 'rxjs';
 import { Router } from '@angular/router';
 
 @Injectable({
@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 })
 export class AuthService {
   private api_url = "http://localhost:5000/api/auth";
+   private userData: any;
 
 
   constructor() { }
@@ -28,12 +29,28 @@ export class AuthService {
   }
 
   isAuthenticated(): Observable<boolean>{
-    return this.http.get<boolean>(`${this.api_url}/check-auth`,{
-          withCredentials: true
-
-    });
-
-    
+    return this.http.get<{ isAuthenticated: boolean, user: any }>(`${this.api_url}/check-auth`,{
+      withCredentials: true
+    }).pipe(
+      map((response) => {
+        if(response.isAuthenticated){
+          this.userData = response.user;
+          return true;
+        }
+        return false;
+      }),
+      catchError(() => {
+        return of(false);
+      })
+    )
   }
+
+  setUserData(data: any){
+      this.userData = data;
+    }
+
+  getUserData(){
+      return this.userData
+    }
 
 }

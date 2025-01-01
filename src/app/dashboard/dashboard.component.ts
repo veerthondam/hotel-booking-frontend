@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { AuthService } from '../service/auth.service';
 import { Router } from '@angular/router';
 
@@ -7,20 +7,15 @@ import { Router } from '@angular/router';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit{
+  username: string = "";
 
-  authService: AuthService = inject(AuthService);
-  router: Router = inject(Router);
+  authService = inject(AuthService);
 
-logout() {
-    this.authService.logout().subscribe({
-      next: () => {
-        this.router.navigate(['login']); // Redirect to login after successful logout
-      },
-      error: (err) => {
-        console.error('Logout failed', err);
-        alert('An error occurred during logout. Please try again.');
-      }
-    });
+  ngOnInit(): void {
+    {
+      console.log(this.authService.getUserData());
+    }
   }
+
 }
